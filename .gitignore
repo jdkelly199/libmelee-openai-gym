@@ -1,0 +1,6 @@
+# Ignoring directories
+models/
+expert_data/
+
+# Ignore Saved Models
+*.zip
