@@ -7,16 +7,17 @@ from stable_baselines.gail import ExpertDataset
 from melee_gym import MeleeEnv
 from stable_baselines.common.callbacks import CallbackList, CheckpointCallback, EveryNTimesteps
 
+import progress_bar
+import csv_callback
+
 import os
 import numpy as np
-
-import progress_bar
 
 def main():
   # The algorithms require a vectorized environment to run
   # RL learning steps
   learn_steps = 1000000
-  env = DummyVecEnv([lambda: MeleeEnv(training_iterations=learn_steps)])
+  env = MeleeEnv(training_iterations=learn_steps)
 
   #load plank model or saved model
   #model = DQN('MlpPolicy', env, verbose=1)
@@ -37,23 +38,12 @@ def main():
   #model.pretrain(dataset, n_epochs=1000)
   #model.save(make run_dc)
 
-  def csv_callback(_locals: Dict[str, Any], _globals: Dict[str, Any]) -> bool:
-    """
-    Callback called at each step (for DQN and others) or after n steps (see ACER or PPO2).
-    This callback will save the model and stop the training after the first call.
-
-    :param _locals: (Dict[str, Any])
-    :param _globals: (Dict[str, Any])
-    :return: (bool) If your callback returns False, training is aborted early.
-    """
-    print(_globals, _locals)
-    return True  # returns False, training stops.
-
   #callbacks
+  csv_callback_function = csv_callback.CSVCallback(env=env)
   checkpoint_callback = CheckpointCallback(save_freq = int(learn_steps/10), save_path='./models/DQN/heur',
                                            name_prefix='rl_model_test')
   with progress_bar.ProgressBarManager(learn_steps) as progress_callback:
-    model.learn(total_timesteps=learn_steps, callback=[progress_callback, checkpoint_callback, csv_callback])
+    model.learn(total_timesteps=learn_steps, callback=[progress_callback, checkpoint_callback, csv_callback_function])
 
   model.save("D:\libmelee\models\DQN_heur")
   obs = env.reset()

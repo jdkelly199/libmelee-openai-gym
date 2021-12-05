@@ -45,6 +45,7 @@ class MeleeEnv(gym.Env):
 
     self.training_iterations = training_iterations
     self.interation = 0
+    self.obs = None
 
   def _get_random_char(self):
       return self.melee_characters[random.randint(0, len(self.melee_characters) - 1)]
@@ -63,6 +64,7 @@ class MeleeEnv(gym.Env):
 
     obs = self._next_observation()
 
+    self.obs = obs
     self.reward = (obs[0] * 300 - obs[1]) - (obs[10] * 300 - obs[11]) + (((-500 * int(obs[5] == 0) * int(obs[6] == 1)) + (-1 * (abs(obs[2] - obs[12]) + abs(obs[3] - obs[13])))) * (1/2)**(self.interation / (self.training_iterations / 2)))
 
     self.interation += 1
@@ -154,6 +156,9 @@ class MeleeEnv(gym.Env):
 
   def get_gamestate(self):
       return self.gamestate
+
+  def get_obs(self):
+      return self.obs
 
   def render(self, mode='human', close=False):
     # Render the environment to the screen
