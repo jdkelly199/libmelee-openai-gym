@@ -59,12 +59,15 @@ class MeleeEnv(gym.Env):
 
     if self.gamestate.menu_state not in [melee.enums.Menu.IN_GAME, melee.enums.Menu.SUDDEN_DEATH]:
         self.reward = (obs[0] * 300 - obs[1]) - (obs[10] * 300 - obs[11]) + (((-500 * int(obs[5] == 0) * int(obs[6] == 1)) + (-1 * (abs(obs[2] - obs[12]) + abs(obs[3] - obs[13])))) * (1/2)**(self.interation / (self.training_iterations / 2)))
-
         return obs, self.reward, True, {}
 
     obs = self._next_observation()
 
-    self.obs = obs
+    if self.obs is not None:
+        self.obs = obs
+    else:
+        self.obs = "New Game"
+
     self.reward = (obs[0] * 300 - obs[1]) - (obs[10] * 300 - obs[11]) + (((-500 * int(obs[5] == 0) * int(obs[6] == 1)) + (-1 * (abs(obs[2] - obs[12]) + abs(obs[3] - obs[13])))) * (1/2)**(self.interation / (self.training_iterations / 2)))
 
     self.interation += 1
@@ -76,7 +79,7 @@ class MeleeEnv(gym.Env):
 
   def reset(self):
     # Reset the state of the environment to an initial state
-
+    self.obs = None
     if(not self.dolphin):
         self.console.run()
         self.console.connect()

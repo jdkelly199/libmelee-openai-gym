@@ -46,6 +46,10 @@ class CSVCallback(BaseCallback):
 
         with open('rewards/rewards_callback.csv', 'a', newline='') as f:
             writer = csv.writer(f)
-            writer.writerow([str((obs[0] * 300 - obs[1]) - (obs[10] * 300 - obs[11]))])  # Give your csv text here.
+
+            if obs == "New Game":
+                writer.writerow([obs])  # Give your csv text here.
+            else:
+                writer.writerow([str((obs[0] * 300 - obs[1]) - (obs[10] * 300 - obs[11]))])  # Give your csv text here.
 
         return True
