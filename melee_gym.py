@@ -30,7 +30,7 @@ class MeleeEnv(gym.GoalEnv):
     self.melee_characters = [melee.enums.Character.BOWSER, melee.enums.Character.CPTFALCON, melee.enums.Character.DK, melee.enums.Character.DOC, melee.enums.Character.FALCO, melee.enums.Character.FOX, melee.enums.Character.GAMEANDWATCH, melee.enums.Character.GANONDORF, melee.enums.Character.JIGGLYPUFF, melee.enums.Character.LINK, melee.enums.Character.LUIGI, melee.enums.Character.MARIO, melee.enums.Character.MARTH, melee.enums.Character.MEWTWO, melee.enums.Character.NESS, melee.enums.Character.PEACH, melee.enums.Character.PICHU, melee.enums.Character.PIKACHU, melee.enums.Character.ROY, melee.enums.Character.SAMUS, melee.enums.Character.YLINK, melee.enums.Character.YOSHI, melee.enums.Character.ZELDA]
 
     #download Slippi (https://slippi.gg/) and insert path here to dolphin (might be in your temp) here (I can send you a link to the iso when you get here so you do not need to download it elsewhere)
-    self.console = melee.Console(path="D:/Slippi Dolphin")
+    self.console = melee.Console(path="C:/Users/Ian/AppData/Roaming/Slippi Launcher/netplay")#"C:/Users/Ian/OneDrive/Desktop/CS238/Slippi Dolphin")
 
     self.ai = ai
     self.cpu = cpu
@@ -48,7 +48,8 @@ class MeleeEnv(gym.GoalEnv):
     self.dolphin = False
     self.cpu_level = 1
     self.reward = -1
-    self.desired_goal = np.array([0, 0, -1000, -1000, 0, 0, 0, 0, 0, 0, 3, 0, -1000, -1000, 0, 0, 0, 0, 0, 0])
+    self.accomplished = False
+    self.desired_goal = np.array([4, 0, -1000, -1000, 0, 0, 0, 0, 0, 0, 3, 0, -1000, -1000, 0, 0, 0, 0, 0, 0])
 
     self.cpu_char = self._get_random_char()
 
@@ -58,7 +59,8 @@ class MeleeEnv(gym.GoalEnv):
 
   def compute_reward(self, achieved_goal, desired_goal, info={}):
       reward = -1
-      if achieved_goal[10] == desired_goal[10]:
+      if achieved_goal[10] == desired_goal[10] and achieved_goal[0] == desired_goal[0]:
+          self.accomplished = True
           reward = 0
       return reward
 
@@ -136,6 +138,7 @@ class MeleeEnv(gym.GoalEnv):
 
 
     while self.gamestate.menu_state not in [melee.enums.Menu.IN_GAME, melee.enums.Menu.SUDDEN_DEATH]:
+        self.gamestate = self.console.step()
         if(self.ai == 0 or self.ai == 1):
             melee.menuhelper.MenuHelper.menu_helper_simple(self.gamestate,
                                                            self.controller,
@@ -164,8 +167,6 @@ class MeleeEnv(gym.GoalEnv):
                                                        autostart=True,
                                                        swag=True)
 
-        if self.gamestate.menu_state not in [melee.enums.Menu.IN_GAME, melee.enums.Menu.SUDDEN_DEATH]:
-            self.gamestate = self.console.step()
 
 
 
@@ -205,6 +206,9 @@ class MeleeEnv(gym.GoalEnv):
 
   def get_obs(self):
       return self.obs
+
+  def close(self):
+      self.console.stop()
 
   def render(self, mode='human', close=False):
     # Render the environment to the screen
