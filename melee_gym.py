@@ -30,7 +30,7 @@ class MeleeEnv(gym.GoalEnv):
     self.melee_characters = [melee.enums.Character.BOWSER, melee.enums.Character.CPTFALCON, melee.enums.Character.DK, melee.enums.Character.DOC, melee.enums.Character.FALCO, melee.enums.Character.FOX, melee.enums.Character.GAMEANDWATCH, melee.enums.Character.GANONDORF, melee.enums.Character.JIGGLYPUFF, melee.enums.Character.LINK, melee.enums.Character.LUIGI, melee.enums.Character.MARIO, melee.enums.Character.MARTH, melee.enums.Character.MEWTWO, melee.enums.Character.NESS, melee.enums.Character.PEACH, melee.enums.Character.PICHU, melee.enums.Character.PIKACHU, melee.enums.Character.ROY, melee.enums.Character.SAMUS, melee.enums.Character.YLINK, melee.enums.Character.YOSHI, melee.enums.Character.ZELDA]
 
     #download Slippi (https://slippi.gg/) and insert path here to dolphin (might be in your temp) here (I can send you a link to the iso when you get here so you do not need to download it elsewhere)
-    self.console = melee.Console(path="C:/Users/Ian/OneDrive/Desktop/CS238/Slippi Dolphin")
+    self.console = melee.Console(path="D:/Slippi Dolphin")
 
     self.ai = ai
     self.cpu = cpu
