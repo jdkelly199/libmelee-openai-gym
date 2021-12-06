@@ -14,7 +14,7 @@ model = HER('MlpPolicy',env,DQN,n_sampled_goal=nsg, \
             batch_size=256, policy_kwargs=dict(layers=[256,256,256]))
 
 
-model.learn(total_timesteps=20000)
+model.learn(total_timesteps=100000)
 
 logs_path = "C:/Users/Ian/OneDrive/Desktop/CS238/libmelee/logs/"
 model.save(logs_path + "her_v1")
