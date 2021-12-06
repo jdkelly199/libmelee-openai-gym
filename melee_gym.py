@@ -4,8 +4,9 @@ import numpy as np
 import melee
 import random
 import melee_actions
+from collections import OrderedDict
 
-class MeleeEnv(gym.Env):
+class MeleeEnv(gym.GoalEnv):
   """Custom Environment that follows gym interface"""
   metadata = {'render.modes': ['human']}
 
@@ -14,10 +15,17 @@ class MeleeEnv(gym.Env):
     # Define action and observation space
     # They must be gym.spaces objects
     # Example when using discrete actions:
-    self.action_space = spaces.Discrete(34)
+    self.action_space = spaces.Discrete(26)
     # Example for using image as input:
-    self.observation_space = spaces.Box(np.array([0, 0, -1000, -1000, 0, 0, 0, 0, 0, 0, 0, 0, -1000, -1000, 0, 0, 0, 0, 0, 0]), #player 1(stock, percent, x, y, facing, on_ground, off_stage, action, jumps_left, invulnerable), player 2(stock, percent, x, y, facing, on_ground, off_stage, action, jumps_left, invulnerable)
-                                        np.array([4, 1000, 1000, 1000, 1, 1, 1, 500, 10, 1, 4, 1000, 1000, 1000, 1, 1, 1, 500, 10, 1])) #player 1(stock, percent, x, y, facing, on_ground, off_stage, action, jumps_left, invulnerable), #player 2(stock, percent, x, y, facing, on_ground, off_stage, action, jumps_left, invulnerable)
+    self.observation_space = spaces.Dict(
+        {
+            "observation": spaces.Box(np.array([0, 0, -1000, -1000, 0, 0, 0, 0, 0, 0, 0, 0, -1000, -1000, 0, 0, 0, 0, 0, 0]), #player 1(stock, percent, x, y, facing, on_ground, off_stage, action, jumps_left, invulnerable), player 2(stock, percent, x, y, facing, on_ground, off_stage, action, jumps_left, invulnerable)
+                        np.array([4, 1000, 1000, 1000, 1, 1, 1, 500, 10, 1, 4, 1000, 1000, 1000, 1, 1, 1, 500, 10, 1])), #player 1(stock, percent, x, y, facing, on_ground, off_stage, action, jumps_left, invulnerable), #player 2(stock, percent, x, y, facing, on_ground, off_stage, action, jumps_left, invulnerable)
+            "achieved_goal": spaces.Box(np.array([0, 0, -1000, -1000, 0, 0, 0, 0, 0, 0, 0, 0, -1000, -1000, 0, 0, 0, 0, 0, 0]), #player 1(stock, percent, x, y, facing, on_ground, off_stage, action, jumps_left, invulnerable), player 2(stock, percent, x, y, facing, on_ground, off_stage, action, jumps_left, invulnerable)
+                        np.array([4, 1000, 1000, 1000, 1, 1, 1, 500, 10, 1, 4, 1000, 1000, 1000, 1, 1, 1, 500, 10, 1])),
+            "desired_goal": spaces.Box(np.array([0, 0, -1000, -1000, 0, 0, 0, 0, 0, 0, 0, 0, -1000, -1000, 0, 0, 0, 0, 0, 0]), #player 1(stock, percent, x, y, facing, on_ground, off_stage, action, jumps_left, invulnerable), player 2(stock, percent, x, y, facing, on_ground, off_stage, action, jumps_left, invulnerable)
+                        np.array([4, 1000, 1000, 1000, 1, 1, 1, 500, 10, 1, 4, 1000, 1000, 1000, 1, 1, 1, 500, 10, 1])),
+        })
 
     self.melee_characters = [melee.enums.Character.BOWSER, melee.enums.Character.CPTFALCON, melee.enums.Character.DK, melee.enums.Character.DOC, melee.enums.Character.FALCO, melee.enums.Character.FOX, melee.enums.Character.GAMEANDWATCH, melee.enums.Character.GANONDORF, melee.enums.Character.JIGGLYPUFF, melee.enums.Character.LINK, melee.enums.Character.LUIGI, melee.enums.Character.MARIO, melee.enums.Character.MARTH, melee.enums.Character.MEWTWO, melee.enums.Character.NESS, melee.enums.Character.PEACH, melee.enums.Character.PICHU, melee.enums.Character.PIKACHU, melee.enums.Character.ROY, melee.enums.Character.SAMUS, melee.enums.Character.YLINK, melee.enums.Character.YOSHI, melee.enums.Character.ZELDA]
 
@@ -39,13 +47,20 @@ class MeleeEnv(gym.Env):
 
     self.dolphin = False
     self.cpu_level = 1
-    self.reward = 0
+    self.reward = -1
+    self.desired_goal = np.array([0, 0, -1000, -1000, 0, 0, 0, 0, 0, 0, 3, 0, -1000, -1000, 0, 0, 0, 0, 0, 0])
 
     self.cpu_char = self._get_random_char()
 
     self.training_iterations = training_iterations
     self.interation = 0
     self.obs = None
+
+  def compute_reward(self, achieved_goal, desired_goal, info={}):
+      reward = -1
+      if achieved_goal[10] == desired_goal[10]:
+          reward = 0
+      return reward
 
   def _get_random_char(self):
       return self.melee_characters[random.randint(0, len(self.melee_characters) - 1)]
@@ -57,18 +72,19 @@ class MeleeEnv(gym.Env):
     self._take_action(action)
     self.gamestate = self.console.step()
 
+    self.reward = self.compute_reward(obs['achieved_goal'], obs['desired_goal'])
+
     if self.gamestate.menu_state not in [melee.enums.Menu.IN_GAME, melee.enums.Menu.SUDDEN_DEATH]:
-        self.reward = (obs[0] * 300 - obs[1]) - (obs[10] * 300 - obs[11]) + (((-500 * int(obs[5] == 0) * int(obs[6] == 1)) + (-1 * (abs(obs[2] - obs[12]) + abs(obs[3] - obs[13])))) * (1/2)**(self.interation / (self.training_iterations / 2)))
         return obs, self.reward, True, {}
 
     obs = self._next_observation()
 
     if self.obs is not None:
         self.obs = obs
+        self.reward = self.compute_reward(obs['achieved_goal'], obs['desired_goal'])
     else:
         self.obs = "New Game"
-
-    self.reward = (obs[0] * 300 - obs[1]) - (obs[10] * 300 - obs[11]) + (((-500 * int(obs[5] == 0) * int(obs[6] == 1)) + (-1 * (abs(obs[2] - obs[12]) + abs(obs[3] - obs[13])))) * (1/2)**(self.interation / (self.training_iterations / 2)))
+        self.reward = -1
 
     self.interation += 1
 
@@ -80,6 +96,26 @@ class MeleeEnv(gym.Env):
   def reset(self):
     # Reset the state of the environment to an initial state
     self.obs = None
+    """
+    #reset functionality
+    if self.dolphin:
+        try:
+            self.console.stop()
+        except:
+            print("had the exception")
+        self.dolphin = False
+        self.console = melee.Console(path="C:/Users/Ian/OneDrive/Desktop/CS238/Slippi Dolphin")
+        if(self.ai == 0 or self.ai == 2):
+            self.controller = melee.Controller(console=self.console, port=1)
+        else:
+            self.controller = melee.Controller(console=self.console, port=1, type=melee.ControllerType.GCN_ADAPTER)
+
+        if (self.cpu == 0):
+            self.cpu_controller = melee.Controller(console=self.console, port=2)
+        else:
+            self.cpu_controller = melee.Controller(console=self.console, port=2, type=melee.ControllerType.GCN_ADAPTER)
+    """
+
     if(not self.dolphin):
         self.console.run()
         self.console.connect()
@@ -94,14 +130,12 @@ class MeleeEnv(gym.Env):
     self.cpu_char = self._get_random_char()
     self.gamestate = self.console.step()
 
-    if (self.reward > 200) and (self.cpu_level < 9):
-        self.cpu_level += 1
-        print(self.reward, self.cpu_level)
+    #if (self.reward > -1) and (self.cpu_level < 9):
+    #    self.cpu_level += 1
+    #    print(self.reward, self.cpu_level)
 
 
     while self.gamestate.menu_state not in [melee.enums.Menu.IN_GAME, melee.enums.Menu.SUDDEN_DEATH]:
-        self.gamestate = self.console.step()
-
         if(self.ai == 0 or self.ai == 1):
             melee.menuhelper.MenuHelper.menu_helper_simple(self.gamestate,
                                                            self.controller,
@@ -130,6 +164,11 @@ class MeleeEnv(gym.Env):
                                                        autostart=True,
                                                        swag=True)
 
+        if self.gamestate.menu_state not in [melee.enums.Menu.IN_GAME, melee.enums.Menu.SUDDEN_DEATH]:
+            self.gamestate = self.console.step()
+
+
+
     return self._next_observation()
 
   def _next_observation(self):
@@ -155,7 +194,11 @@ class MeleeEnv(gym.Env):
              int(self.gamestate.players[2].jumps_left),     #18
              int(self.gamestate.players[2].invulnerable)])  #19
 
-      return obs
+      return OrderedDict([
+            ('observation', obs),
+            ('achieved_goal', obs),
+            ('desired_goal', self.desired_goal.copy())
+        ])
 
   def get_gamestate(self):
       return self.gamestate

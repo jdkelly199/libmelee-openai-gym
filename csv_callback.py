@@ -50,6 +50,6 @@ class CSVCallback(BaseCallback):
             if obs == "New Game":
                 writer.writerow([obs])  # Give your csv text here.
             else:
-                writer.writerow([str((obs[0] * 300 - obs[1]) - (obs[10] * 300 - obs[11]))])  # Give your csv text here.
+                writer.writerow(obs['observation'])  # Give your csv text here.
 
         return True

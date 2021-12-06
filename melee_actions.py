@@ -127,11 +127,12 @@ def perform_action(action, controller):
             # Right
             controller.tilt_analog_unit(melee.enums.Button.BUTTON_MAIN, x=-1, y=0)
 
+            """
     # Button_L
     if (action >= 25 and action <= 28):
         for button in enum_buttons:
             if button == melee.enums.Button.BUTTON_L:
-                controller.press_shoulder(button, 1)
+                controller.press_shoulder(button, 0)
             else:
                 controller.release_button(button)
 
@@ -152,7 +153,7 @@ def perform_action(action, controller):
     if (action >= 29 and action <= 32):
         for button in enum_buttons:
             if button == melee.enums.Button.BUTTON_R:
-                controller.press_shoulder(button, 1)
+                controller.press_shoulder(button, 0)
             else:
                 controller.release_button(button)
 
@@ -168,9 +169,10 @@ def perform_action(action, controller):
         elif (action == 32):
             # Right
             controller.tilt_analog_unit(melee.enums.Button.BUTTON_MAIN, x=-1, y=0)
+    """
 
     # Button_Z
-    if (action == 33):
+    if (action == 25):
         for button in enum_buttons:
             if button == melee.enums.Button.BUTTON_Z:
                 controller.press_button(button)
@@ -309,7 +311,7 @@ def get_action(controller):
             return 29
     elif (controller.button[melee.enums.Button.BUTTON_Z]):
         #grab
-        return 33
+        return 25
 
     #no button
     elif (abs(0.5 - controller.main_stick[1]) > abs(
