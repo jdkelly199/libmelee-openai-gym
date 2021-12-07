@@ -24,21 +24,22 @@ nsg = 4
 #model = PPO2.load('models/PPO2_pretrain_rl_long', env)
 model = HER('MlpPolicy',env,DQN,n_sampled_goal=nsg, \
             goal_selection_strategy='future', verbose=1, \
-            buffer_size=int(1e8), learning_rate=1e-3, gamma=0.95, \
+            buffer_size=int(1e8), learning_rate=1e-3, gamma=0.99, \
             batch_size=256, policy_kwargs=dict(layers=[256,256,256]))
+
+#model = HER.load('D:\libmelee-openai-gym\models\her_no_pre_model_test_400000_steps.zip', env=env)
 
 
 learn_steps = 10000000
 #callbacks
 csv_callback_function = csv_callback.CSVCallback(env=env)
-checkpoint_callback = CheckpointCallback(save_freq = int(learn_steps/10), save_path='./models',
-                                       name_prefix='her_model_test')
+checkpoint_callback = CheckpointCallback(save_freq = int(learn_steps/100), save_path='./models',
+                                       name_prefix='her_less_sparse_rl')
 with progress_bar.ProgressBarManager(learn_steps) as progress_callback:
     model.learn(total_timesteps=learn_steps, callback=[progress_callback, checkpoint_callback, csv_callback_function])
-model.learn(total_timesteps=100000)
 
 logs_path = "D:/libmelee-openai-gym/models/"
-model.save(logs_path + "her_v1")
+model.save(logs_path + "her_final_v1")
 #env.save(logs_path + "vec_normalize.pkl")
 
 

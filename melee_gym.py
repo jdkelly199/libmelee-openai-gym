@@ -48,7 +48,7 @@ class MeleeEnv(gym.GoalEnv):
     self.dolphin = False
     self.cpu_level = 1
     self.reward = -1
-    self.desired_goal = np.array([0, 0, -1000, -1000, 0, 0, 0, 0, 0, 0, 3, 0, -1000, -1000, 0, 0, 0, 0, 0, 0])
+    self.desired_goal = np.array([0, 0, -1000, -1000, 0, 0, 0, 0, 0, 0, 0, 0, -1000, -1000, 0, 0, 0, 0, 0, 0])
 
     self.cpu_char = self._get_random_char()
 
@@ -57,9 +57,7 @@ class MeleeEnv(gym.GoalEnv):
     self.obs = None
 
   def compute_reward(self, achieved_goal, desired_goal, info={}):
-      reward = -1
-      if achieved_goal[10] == desired_goal[10]:
-          reward = 0
+      reward = achieved_goal[0] - achieved_goal[10]
       return reward
 
   def _get_random_char(self):
