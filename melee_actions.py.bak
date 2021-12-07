@@ -102,6 +102,31 @@ def perform_action(action, controller):
         elif (action == 19):
             # Right
             controller.tilt_analog_unit(melee.enums.Button.BUTTON_MAIN, x=-1, y=0)
+
+    # Button_Y
+    if (action >= 20 and action <= 24):
+        for button in enum_buttons:
+            if button == melee.enums.Button.BUTTON_Y:
+                controller.press_button(button)
+            else:
+                controller.release_button(button)
+
+        if (action == 20):
+            # Neural
+            controller.tilt_analog_unit(melee.enums.Button.BUTTON_MAIN, x=0, y=0)
+        elif (action == 21):
+            # Up
+            controller.tilt_analog_unit(melee.enums.Button.BUTTON_MAIN, x=0, y=1)
+        elif (action == 22):
+            # Down
+            controller.tilt_analog_unit(melee.enums.Button.BUTTON_MAIN, x=0, y=-1)
+        elif (action == 23):
+            # Left
+            controller.tilt_analog_unit(melee.enums.Button.BUTTON_MAIN, x=1, y=0)
+        elif (action == 24):
+            # Right
+            controller.tilt_analog_unit(melee.enums.Button.BUTTON_MAIN, x=-1, y=0)
+
             """
     # Button_L
     if (action >= 25 and action <= 28):
@@ -147,7 +172,7 @@ def perform_action(action, controller):
     """
 
     # Button_Z
-    if (action == 20):
+    if (action == 25):
         for button in enum_buttons:
             if button == melee.enums.Button.BUTTON_Z:
                 controller.press_button(button)

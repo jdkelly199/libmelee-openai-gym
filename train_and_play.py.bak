@@ -31,7 +31,7 @@ model = HER('MlpPolicy',env,DQN,n_sampled_goal=nsg, \
 learn_steps = 10000000
 #callbacks
 csv_callback_function = csv_callback.CSVCallback(env=env)
-checkpoint_callback = CheckpointCallback(save_freq = int(learn_steps/100), save_path='./models',
+checkpoint_callback = CheckpointCallback(save_freq = int(learn_steps/10), save_path='./models',
                                        name_prefix='her_model_test')
 with progress_bar.ProgressBarManager(learn_steps) as progress_callback:
     model.learn(total_timesteps=learn_steps, callback=[progress_callback, checkpoint_callback, csv_callback_function])
