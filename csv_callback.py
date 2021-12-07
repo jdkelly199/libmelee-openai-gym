@@ -1,5 +1,6 @@
 from stable_baselines.common.callbacks import BaseCallback
 import csv
+import datetime
 
 
 class CSVCallback(BaseCallback):
@@ -29,7 +30,8 @@ class CSVCallback(BaseCallback):
         # self.parent = None  # type: Optional[BaseCallback]
         self.env = env
 
-        with open('rewards/rewards_callback.csv', 'w', newline='') as f:
+        self.filename = 'rewards/rewards_callback' + str(datetime.datetime.now().month) + str(datetime.datetime.now().day) + str(datetime.datetime.now().hour) + str(datetime.datetime.now().minute) + str(datetime.datetime.now().second) + '.csv'
+        with open(self.filename, 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(['Reward'])  # Give your csv text here.
 
@@ -44,12 +46,12 @@ class CSVCallback(BaseCallback):
         """
         obs = self.env.obs
 
-        with open('rewards/rewards_callback.csv', 'a', newline='') as f:
+        with open(self.filename, 'a', newline='') as f:
             writer = csv.writer(f)
 
             if obs == "New Game":
                 writer.writerow([obs])  # Give your csv text here.
             else:
-                writer.writerow(obs['observation'])  # Give your csv text here.
+                writer.writerow(obs)  # Give your csv text here.
 
         return True

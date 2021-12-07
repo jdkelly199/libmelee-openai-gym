@@ -135,7 +135,6 @@ def perform_action(action, controller):
                 controller.press_shoulder(button, 0)
             else:
                 controller.release_button(button)
-
         if (action == 25):
             # Neural
             controller.tilt_analog_unit(melee.enums.Button.BUTTON_MAIN, x=0, y=0)
@@ -148,7 +147,6 @@ def perform_action(action, controller):
         elif (action == 28):
             # Right
             controller.tilt_analog_unit(melee.enums.Button.BUTTON_MAIN, x=-1, y=0)
-
     # Button_R
     if (action >= 29 and action <= 32):
         for button in enum_buttons:
@@ -156,7 +154,6 @@ def perform_action(action, controller):
                 controller.press_shoulder(button, 0)
             else:
                 controller.release_button(button)
-
         if (action == 29):
             # Neural
             controller.tilt_analog_unit(melee.enums.Button.BUTTON_MAIN, x=0, y=0)
