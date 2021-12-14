@@ -48,12 +48,11 @@ class MeleeEnv(gym.GoalEnv):
 
     self.cpu_char = self._get_random_char()
 
-    self.training_iterations = training_iterations
-    self.interation = 0
     self.obs = None
 
   def compute_reward(self, obs):
-      reward = self.reward = (obs[0] * 300 - obs[1]) - (obs[10] * 300 - obs[11]) + (((-250 * int(obs[20] != 0) + obs[3] * int(obs[20] != 0)) + (-1 * (abs(obs[2] - obs[12]) + abs(obs[3] - obs[13])))) * (1/2)**(self.interation / (self.training_iterations / 2)))
+      #define your own reward
+      reward = self.reward = (obs[0] * 300 - obs[1]) - (obs[10] * 300 - obs[11]) 
       return reward
 
   def isAccomplished(self):
@@ -81,12 +80,10 @@ class MeleeEnv(gym.GoalEnv):
 
     if self.obs is not None:
         self.obs = obs
-        self.reward = self.compute_reward(obs)
     else:
         self.obs = "New Game"
-        self.reward = -1
-
-    self.interation += 1
+    
+    self.reward = self.compute_reward(obs)
 
     return obs, self.reward, False, {}
 
